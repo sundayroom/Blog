@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<link href="/static/css_js/jquery.fancybox.css" rel="stylesheet" type="text/css">
+<link href="/static/css_js/bootstrap.js" rel="stylesheet" type="text/css">
+<link href="/static/css_js/jquery.lazyload.js" rel="stylesheet" type="text/css">
+<link href="/static/css_js/jquery.fancybox.pack.js" rel="stylesheet" type="text/css">
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+<script>
+    $(function(){
+        $('#jsStayBtn').on('click', function(){
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url:"/add_comment/",
+                data:$('#jsStayForm').serialize(),
+                dateType:"json",
+                async: true,
+                beforeSend:function(xhr, settings){
+                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+            },
+                success: function(data) {
+                    if(data.status == 'success'){
+                        alert("提交成功");
+                         window.location.reload();//刷新当前页面.
+                    }else if(data.status == 'fail'){
+                        alert("评论错误，请重新评论");
+                    }
+                },
+            });
+        });
+    })
+</script>
+<body>
+{# 首先都存在跳转问题,而且csrf_token都取不到,是路径的问题.... #}
+<h1>Wecome {{ username }}!</h1>
+<br>
+<a href="http://127.0.0.1:8000/logout">登出</a>
+<br>
+<a href="http://127.0.0.1:8000/login">登录</a>
+<br>
+<a href="http://127.0.0.1:8000/register">注册</a>
+
+{% for blog in all_blog.object_list %}
+
+
+    <article>
+   {{ blog.title }}
+{{ blog.create_time|date:'Y-m-d' }}
+
+{{ blog.content }}
+        分类{{ blog.category.name }}
+    <form class="comment-form" id="jsStayForm">
+
+      <div class="form-group">
+        <label class="name">名字:  </label>
+        <input name="name" type="text" class="form-name" id="js-name" placeholder="不超过20个字">
+
+      </div>
+      <div class="form-group">
+        <label class="comment">评论:</label>
+        <textarea name="content" class="form-control" id="js-content" rows="5" placeholder="不超过300个字"></textarea>
+
+      </div>
+        <input name="blog" type="hidden" id="js-name" value="{{ blog.id }}">
+        <p class="error company-tips" id="jsCompanyTips"></p>
+
+        <button class="btn" type="button" id="jsStayBtn" value="发表">发表</button>
+    </form>
+
+
+    </article>
+
+
+        {%for comment in all_comment %}
+            {% ifequal comment.blog_id blog.id %}
+            <li class="comment-item">
+            <hr class="the-line"  />
+                <span class="nickname">{{ comment.name }} - </span>
+                <time class="submit-date"
+                      datetime="{{ comment.create_time }}">{{ comment.create_time|date:"Y/m/d   h:m" }}</time>
+                <p class="floor">{{ forloop.counter }} #  </p>
+                <div style="word-wrap: break-word">
+                        {{ comment.comment }}
+                </div>
+
+            </li>
+            {% endifequal %}
+        {% empty %}
+            暂无评论
+
+        {% endfor %}
+
+
+   {% endfor %}
+{{ blog.click_nums }}
+
+<!--分页展示-->
+<nav class="pagination">
+    <div class="pageturn">
+        <ul class="pagelist">
+
+            {% if all_blog.has_previous %}
+                <li class="long"><a href="?{{ all_blog.previous_page_number.querystring }}">上一页</a></li>
+            {% endif %}
+
+            {% for page in all_blog.pages %}
+            {% if page %}
+                {% ifequal page all_blog.number %}
+                    <li class="active"><a href="?{{ page.querystring }}">{{ page }}</a></li>
+                {% else %}
+                     <li><a href="?{{ page.querystring }}" class="page">{{ page }}</a></li>
+                {% endifequal %}
+            {% else %}
+                <li class="none"><a href="">...</a></li>
+            {% endif %}
+            {% endfor %}
+            {% if all_blog.has_next %}
+                <li class="long"><a href="?{{ all_blog.next_page_number.querystring }}">下一页</a></li>
+            {% endif %}
+
+        </ul>
+    </div>
+</nav>
+{#<form class="comment-form" id="jsStayForm">#}
+{##}
+{#      <div class="form-group">#}
+{#        <label class="name">名字:  </label>#}
+{#        <input name="name" type="text" class="form-name" id="js-name" placeholder="不超过20个字">#}
+{##}
+{#      </div>#}
+{#      <div class="form-group">#}
+{#        <label class="comment">评论:</label>#}
+{#        <textarea name="content" class="form-control" id="js-content" rows="5" placeholder="不超过300个字"></textarea>#}
+{##}
+{#      </div>#}
+{#        <input name="blog" type="hidden" id="js-name" value="{{ blog.id }}">#}
+{#        <p class="error company-tips" id="jsCompanyTips"></p>#}
+{##}
+{#        <button class="btn" type="button" id="jsStayBtn" value="发表">发表</button>#}
+{#    </form>#}
+
+</body>
+</html>

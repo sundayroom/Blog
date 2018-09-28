@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>regroup</title>
+</head>
+<body>
+<ul>
+----------共有{{length}}-----------数量的微博
+<br>
+{% regroup all_blog.object_list by create_time.year as dates_by_year %}
+    {% for year in dates_by_year %}
+       {{ year.grouper }}年
+        <br>
+        {% regroup year.list by create_time.month as dates_by_month %}
+        {% for month in dates_by_month %}
+            <li>{{ month.grouper }}月</li>
+            <br>
+            <ul>
+
+            {% for blog in month.list %}
+                <li>标题{{ blog.title }}</li>
+                <br>
+            {% endfor %}
+            </ul>
+        {% endfor %}
+{% endfor %}
+</ul>
+
+</body>
+</html>

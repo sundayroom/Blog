@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+{%csrf_token%}
+<form method="post">
+         {{ usermess.as_p }}
+    <input type="submit" value="login">
+    <br>
+    <a href="http://127.0.0.1:8000/register">register</a>
+
+</form>
+</body>
+</html>

@@ -1,0 +1,4 @@
+{{object.title}}
+{{object.create_time}}
+{{object.click_nums}}
+{{object.content}}
